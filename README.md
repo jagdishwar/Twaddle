@@ -5,7 +5,7 @@
 
   
   
-  ![demo](https://user-images.githubusercontent.com/39494791/92506914-ccaeb400-f223-11ea-853b-20f1326d39b5.gif)
+  
 
 > nltk https://www.nltk.org
 
