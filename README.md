@@ -1,5 +1,12 @@
 # Twaddle
-  A personal assistant chatbot
+  Socket Programming + Neural network + TextToSpeech conveter = A.I chatbot which helps you sell products 
+  
+  ![demo](https://user-images.githubusercontent.com/39494791/92507171-2f07b480-f224-11ea-9e24-2176c6674832.gif)
+
+  
+  
+  ![demo](https://user-images.githubusercontent.com/39494791/92506914-ccaeb400-f223-11ea-853b-20f1326d39b5.gif)
+
 > nltk https://www.nltk.org
 
 > numpy http://numpy.org/
