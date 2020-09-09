@@ -17,17 +17,18 @@ import json
 
 with open('intents.json') as file:
     data = json.load(file)
-try:
-    with open("data.pickle", "rb") as f:
-        words, labels, training, output = pickle.load(f)
-except:
-    words = []
-    labels = []
-    docs_x = []
-    docs_y = []
 
-    for intent in data['intents']:
+#pickle ser
+with open("data.pickle", "rb") as f:
+        words, labels, training, output = pickle.load(f)
+words = []
+labels = []
+docs_x = []
+docs_y = []
+# n
+for  intent in data['intents']:
         for pattern in intent['patterns']:
+            #root word
             wrds = nltk.word_tokenize(pattern)
             words.extend(wrds)
             docs_x.append(wrds)
@@ -35,18 +36,20 @@ except:
 
         if intent['tag'] not in labels:
             labels.append(intent['tag'])
+    # remove extra characters and make it small for comparison
+words = [stemmer.stem(w.lower()) for w in words if w != "?"]
+    # remove all the duplicates and sort them
+words = sorted(list(set(words)))
 
-    words = [stemmer.stem(w.lower()) for w in words if w != "?"]
-    words = sorted(list(set(words)))
+labels = sorted(labels)
 
-    labels = sorted(labels)
+training = []
+output = []
 
-    training = []
-    output = []
+out_empty = [0 for _ in range(len(labels))]
+##checking the bag of words ,looping through the chunks of words
 
-    out_empty = [0 for _ in range(len(labels))]
-
-    for x, doc in enumerate(docs_x):
+for x, doc in enumerate(docs_x):
         bag = []
 
         wrds = [stemmer.stem(w.lower()) for w in doc]
@@ -63,22 +66,26 @@ except:
         training.append(bag)
         output.append(output_row)
 
+    # data is ready
+training = numpy.array(training)
+output = numpy.array(output)
 
-    training = numpy.array(training)
-    output = numpy.array(output)
-    with open("data.pickle", "wb") as f:
+with open("data.pickle", "wb") as f:
         pickle.dump((words, labels, training, output), f)
-
+#rid of previous data
 tensorflow.reset_default_graph()
-
-net = tflearn.input_data(shape=[None, len(training[0])])
-net = tflearn.fully_connected(net, 10)
-net = tflearn.fully_connected(net, 10)
+# classifiction of words into output
+net = tflearn.input_data(shape=[None, len(training[0])])# input shape
+net = tflearn.fully_connected(net, 9)#output layer
+net = tflearn.fully_connected(net, 9)#output layer
 net = tflearn.fully_connected(net, len(output[0]), activation="softmax")
 net = tflearn.regression(net)
-
+#model wrapper 'DNN' that can automatically performs a neural network classifier tasks, such as training, prediction, save/restore
 model = tflearn.DNN(net)
+#predicting model output ^
 
+#model fitting
+# ,do train 2000 times
 
 model.fit(training, output, n_epoch=2000, batch_size=10, show_metric=True)
 model.save("model.tflearn")
@@ -98,25 +105,27 @@ def bag_of_words(s, words):
     return numpy.array(bag)
 
 
-def chat():
-    print("Start talking with the bot (type quit to stop)!")
-    while True:
-        inp = input("You: ")
-        if inp.lower() == "quit":
-            break
+def chat(inp):
 
-        results = model.predict([bag_of_words(inp, words)])[0]
-        results_index = numpy.argmax(results)
-        tag = labels[results_index]
 
-        for tg in data["intents"]:
+    if inp.lower() == "quit":
+            texttospeech('good bye! sir')
+
+
+        #predicting the model , in neuron get connection as per valued results
+    results = model.predict([bag_of_words(inp, words)])[0]
+        #max valued index
+    results_index = numpy.argmax(results)
+    tag = labels[results_index]
+
+    for tg in data["intents"]:
                 if tg['tag'] == tag:
                     responses = tg['responses']
-        ans=random.choice(responses)
+    ans=random.choice(responses)
 
-        print(ans)
-        texttospeech.say(ans)
-
+    return (ans)
 
 
-chat()
+
+
+

@@ -1,13 +1,13 @@
 import socket
-import os
+
 
 
 
 MAX_SIZE_BYTES = 65535 # Mazimum size of a UDP datagram
 
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-count=4
-while count:
+
+while True:
     message = input('Input lowercase sentence:' )
     data = message.encode('ascii')
 
@@ -16,4 +16,3 @@ while count:
     data, address = s.recvfrom(MAX_SIZE_BYTES)
     text = data.decode('ascii')
     print('The server {} replied with {!r}'.format(address, text))
-    count-=1

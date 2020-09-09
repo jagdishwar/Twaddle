@@ -1,6 +1,13 @@
 import socket
 
+import chatbot
+import texttospeech
+
+
+
 MAX_SIZE_BYTES = 65535 # Mazimum size of a UDP datagram
+
+
 
 # Setting up a socket
 s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -11,7 +18,9 @@ print('Listening at {}'.format(s.getsockname()))
 while True:
     data, clientAddress = s.recvfrom(MAX_SIZE_BYTES)
     message = data.decode('ascii')
-    upperCaseMessage = message.upper()
-    print('The client at {} says {!r}'.format(clientAddress, message))
+    upperCaseMessage =chatbot.chat(message)
+    print('The response to client at {} says {!r}'.format(clientAddress, message))
     data = upperCaseMessage.encode('ascii')
     s.sendto(data, clientAddress)
+    texttospeech.say(upperCaseMessage)
+
